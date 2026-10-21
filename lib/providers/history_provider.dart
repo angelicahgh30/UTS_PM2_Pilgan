@@ -10,26 +10,26 @@ class HistoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<QuizResult> resultsOf(String email) =>
-      _results.where((r) => r.userEmail == email).toList();
+  List<QuizResult> resultsOf(String userId) =>
+      _results.where((r) => r.userId == userId).toList();
 
-  int averageScore(String email) {
-    final list = resultsOf(email);
+  int averageScore(String userId) {
+    final list = resultsOf(userId);
     if (list.isEmpty) return 0;
     return (list.fold(0, (sum, r) => sum + r.score) / list.length).round();
   }
 
-  int? bestScore(String email, String categoryId) {
-    final list = resultsOf(email).where((r) => r.categoryId == categoryId);
+  int? bestScore(String userId, String categoryId) {
+    final list = resultsOf(userId).where((r) => r.categoryId == categoryId);
     if (list.isEmpty) return null;
     return list.map((r) => r.score).reduce((a, b) => a > b ? a : b);
   }
 
-  int triedCategories(String email) =>
-      resultsOf(email).map((r) => r.categoryId).toSet().length;
+  int triedCategories(String userId) =>
+      resultsOf(userId).map((r) => r.categoryId).toSet().length;
 
-  int bestCombo(String email) {
-    final list = resultsOf(email);
+  int bestCombo(String userId) {
+    final list = resultsOf(userId);
     if (list.isEmpty) return 0;
     return list.map((r) => r.bestCombo).reduce((a, b) => a > b ? a : b);
   }

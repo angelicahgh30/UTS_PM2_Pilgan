@@ -171,8 +171,8 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  QuizResult toResult(String userEmail) => QuizResult(
-    userEmail: userEmail,
+  QuizResult toResult(String userId) => QuizResult(
+    userId: userId,
     categoryId: _category!.id,
     categoryTitle: _category!.title,
     total: totalQuestions,

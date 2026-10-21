@@ -1,5 +1,5 @@
 class QuizResult {
-  final String userEmail;
+  final String userId;
   final String categoryId;
   final String categoryTitle;
   final int total;
@@ -11,7 +11,7 @@ class QuizResult {
   final List<int?> answers;
 
   const QuizResult({
-    required this.userEmail,
+    required this.userId,
     required this.categoryId,
     required this.categoryTitle,
     required this.total,
