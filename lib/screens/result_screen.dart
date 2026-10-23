@@ -31,7 +31,7 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final quiz = context.watch<QuizProvider>();
-    if (!quiz.isFinished || quiz.category == null) {
+    if (!quiz.isFinished || quiz.chapter == null) {
       return Scaffold(appBar: AppBar(), body: const SizedBox.shrink());
     }
 
@@ -71,7 +71,12 @@ class ResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              NavyTitle(title: 'Hasil kuis', subtitle: quiz.category!.title),
+              NavyTitle(
+                title: 'Hasil kuis',
+                subtitle:
+                    '${quiz.category!.title} · ${quiz.chapter!.label}: '
+                    '${quiz.chapter!.title}',
+              ),
               AdaptiveTwoPane(
                 first: AppCard(
                   padding: EdgeInsets.all(r.sp(24)),

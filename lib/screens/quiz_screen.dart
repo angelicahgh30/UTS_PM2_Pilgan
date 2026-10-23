@@ -102,7 +102,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
     }
 
     final r = context.responsive;
-    final category = quiz.category!;
+    final chapter = quiz.chapter!;
 
     return PopScope(
       canPop: false,
@@ -118,7 +118,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
             icon: const Icon(Icons.close_rounded),
           ),
           title: Text(
-            category.title,
+            '${chapter.label}: ${chapter.title}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

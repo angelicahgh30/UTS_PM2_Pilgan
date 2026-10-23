@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screens/chapter_list_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/main_shell.dart';
 import '../screens/quiz_intro_screen.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const welcome = '/';
   static const login = '/login';
   static const main = '/main';
+  static const chapters = '/chapters';
   static const quizIntro = '/quiz-intro';
   static const quiz = '/quiz';
   static const result = '/result';
@@ -23,6 +25,7 @@ class AppRoutes {
     welcome: (_) => const WelcomeScreen(),
     login: (_) => const LoginScreen(),
     main: (_) => const MainShell(),
+    chapters: (_) => const ChapterListScreen(),
     quizIntro: (_) => const QuizIntroScreen(),
     quiz: (_) => const QuizScreen(),
     result: (_) => const ResultScreen(),

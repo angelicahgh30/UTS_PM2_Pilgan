@@ -45,11 +45,8 @@ void main() {
     expect(find.text('Budi'), findsOneWidget);
   });
 
-  testWidgets('Beranda menampilkan materi dan membuka detail materi', (
-    tester,
-  ) async {
-    final auth = AuthProvider()
-      ..enter('Pengguna Demo');
+  testWidgets('Beranda membuka daftar bab, lalu detail bab', (tester) async {
+    final auth = AuthProvider()..enter('Pengguna Demo');
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -58,13 +55,17 @@ void main() {
 
     expect(find.text('Pilih materi'), findsOneWidget);
     await tapText(tester, 'Basis Data');
+    expect(find.text('Daftar bab'), findsOneWidget);
+    expect(find.text('BAB 1'), findsOneWidget);
+    expect(find.text('BAB 3'), findsOneWidget);
+    await tapText(tester, 'Bahasa SQL');
+    expect(find.text('Bab 2'), findsOneWidget);
     expect(find.text('Cara bermain'), findsOneWidget);
     expect(find.text('Mulai kuis'), findsOneWidget);
   });
 
   testWidgets('Menjawab soal langsung menampilkan feedback', (tester) async {
-    final auth = AuthProvider()
-      ..enter('Pengguna Demo');
+    final auth = AuthProvider()..enter('Pengguna Demo');
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -72,24 +73,24 @@ void main() {
     await tester.pumpAndSettle();
 
     await tapText(tester, 'Basis Data');
+    await tapText(tester, 'Konsep Dasar Basis Data');
     await tapText(tester, 'Mulai kuis');
-    expect(find.text('Soal 1 dari 10'), findsOneWidget);
+    expect(find.text('Soal 1 dari 5'), findsOneWidget);
 
-    final first = quizCategories[1].questions.first;
+    final first = quizCategories[1].chapters.first.questions.first;
     await tapText(tester, first.correctAnswer);
     expect(find.text('Jawaban kamu benar!'), findsOneWidget);
     expect(find.text('1 benar'), findsOneWidget);
 
     await tapText(tester, 'Soal berikutnya');
-    expect(find.text('Soal 2 dari 10'), findsOneWidget);
+    expect(find.text('Soal 2 dari 5'), findsOneWidget);
   });
 
   testWidgets('Soal terakhir membuka hasil, lalu pembahasan', (tester) async {
-    final auth = AuthProvider()
-      ..enter('Pengguna Demo');
+    final auth = AuthProvider()..enter('Pengguna Demo');
     final quiz = QuizProvider(secondsPerQuestion: 0)
       ..setUserName('Pengguna Demo')
-      ..startQuiz(quizCategories.first);
+      ..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
     for (var i = 0; i < quiz.totalQuestions - 1; i++) {
       quiz
         ..selectAnswer(quiz.currentQuestion.correctIndex)
@@ -107,7 +108,7 @@ void main() {
 
     await tapText(tester, 'Lihat hasil');
     expect(find.text('Luar biasa, Pengguna!'), findsOneWidget);
-    expect(find.text('90'), findsOneWidget);
+    expect(find.text('80'), findsOneWidget);
 
     await tapText(tester, 'Lihat pembahasan');
     await tapText(tester, 'Salah (1)');
@@ -118,8 +119,7 @@ void main() {
   testWidgets('Riwayat kosong lalu keluar akun kembali ke sambutan', (
     tester,
   ) async {
-    final auth = AuthProvider()
-      ..enter('Pengguna Demo');
+    final auth = AuthProvider()..enter('Pengguna Demo');
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

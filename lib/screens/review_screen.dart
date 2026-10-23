@@ -27,10 +27,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
       return Scaffold(appBar: AppBar(), body: const SizedBox.shrink());
     }
 
-    final category = quizCategories.firstWhere(
-      (c) => c.id == result.categoryId,
-    );
-    final questions = category.questions;
+    final chapter = categoryById(result.categoryId)
+        .chapterById(result.chapterId);
+    final questions = chapter.questions;
     final indexes = [
       for (var i = 0; i < questions.length; i++)
         if (_filter == _Filter.all ||
@@ -46,7 +45,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     };
 
     return Scaffold(
-      appBar: AppBar(title: Text('Pembahasan ${category.title}')),
+      appBar: AppBar(title: Text('Pembahasan ${chapter.label}')),
       body: SafeArea(
         child: PageContainer(
           child: Column(

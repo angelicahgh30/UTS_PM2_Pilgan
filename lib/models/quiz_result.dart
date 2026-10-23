@@ -2,6 +2,9 @@ class QuizResult {
   final String userId;
   final String categoryId;
   final String categoryTitle;
+  final String chapterId;
+  final String chapterTitle;
+  final int chapterNumber;
   final int total;
   final int correct;
   final int timedOut;
@@ -14,6 +17,9 @@ class QuizResult {
     required this.userId,
     required this.categoryId,
     required this.categoryTitle,
+    required this.chapterId,
+    required this.chapterTitle,
+    required this.chapterNumber,
     required this.total,
     required this.correct,
     required this.timedOut,

@@ -54,6 +54,12 @@ class ResultTile extends StatelessWidget {
                   style: r.text(context.texts.titleSmall),
                 ),
                 SizedBox(height: r.sp(2)),
+                Text(
+                  'Bab ${result.chapterNumber}: ${result.chapterTitle}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: r.text(context.texts.bodySmall),
+                ),
                 Row(
                   children: [
                     Flexible(

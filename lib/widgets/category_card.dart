@@ -7,14 +7,14 @@ import 'app_card.dart';
 
 class CategoryCard extends StatelessWidget {
   final QuizCategory category;
-  final int? bestScore;
+  final int completedChapters;
   final VoidCallback onTap;
 
   const CategoryCard({
     super.key,
     required this.category,
     required this.onTap,
-    this.bestScore,
+    this.completedChapters = 0,
   });
 
   @override
@@ -61,15 +61,22 @@ class CategoryCard extends StatelessWidget {
                   runSpacing: r.sp(6),
                   children: [
                     _Tag(
+                      icon: Icons.menu_book_outlined,
+                      label: '${category.totalChapters} bab',
+                      color: palette.muted,
+                      background: palette.border.withValues(alpha: 0.5),
+                    ),
+                    _Tag(
                       icon: Icons.help_outline_rounded,
                       label: '${category.totalQuestions} soal',
                       color: palette.muted,
                       background: palette.border.withValues(alpha: 0.5),
                     ),
-                    if (bestScore != null)
+                    if (completedChapters > 0)
                       _Tag(
-                        icon: Icons.emoji_events_outlined,
-                        label: 'Terbaik $bestScore',
+                        icon: Icons.check_circle_outline_rounded,
+                        label:
+                            '$completedChapters/${category.totalChapters} selesai',
                         color: palette.success,
                         background: palette.successSoft,
                       ),

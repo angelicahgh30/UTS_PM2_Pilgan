@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/question.dart';
 import '../models/quiz_category.dart';
+import '../models/quiz_chapter.dart';
 import '../models/quiz_result.dart';
 
 class QuizProvider extends ChangeNotifier {
@@ -13,6 +14,7 @@ class QuizProvider extends ChangeNotifier {
 
   String _userName = '';
   QuizCategory? _category;
+  QuizChapter? _chapter;
   List<int?> _answers = [];
   List<bool> _timedOut = [];
   int _currentIndex = 0;
@@ -29,12 +31,13 @@ class QuizProvider extends ChangeNotifier {
 
   String get userName => _userName;
   QuizCategory? get category => _category;
+  QuizChapter? get chapter => _chapter;
   int get currentIndex => _currentIndex;
   bool get isFinished => _isFinished;
   bool get isRevealed => _revealed;
-  bool get isRunning => _category != null && !_isFinished;
+  bool get isRunning => _chapter != null && !_isFinished;
 
-  List<Question> get questions => _category?.questions ?? const [];
+  List<Question> get questions => _chapter?.questions ?? const [];
   int get totalQuestions => questions.length;
   Question get currentQuestion => questions[_currentIndex];
   bool get isLastQuestion => _currentIndex == totalQuestions - 1;
@@ -77,10 +80,11 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startQuiz(QuizCategory category) {
+  void startQuiz(QuizCategory category, QuizChapter chapter) {
     _category = category;
-    _answers = List<int?>.filled(category.totalQuestions, null);
-    _timedOut = List<bool>.filled(category.totalQuestions, false);
+    _chapter = chapter;
+    _answers = List<int?>.filled(chapter.totalQuestions, null);
+    _timedOut = List<bool>.filled(chapter.totalQuestions, false);
     _currentIndex = 0;
     _revealed = false;
     _isFinished = false;
@@ -95,7 +99,7 @@ class QuizProvider extends ChangeNotifier {
   }
 
   void selectAnswer(int optionIndex) {
-    if (_isFinished || _revealed || _category == null) return;
+    if (_isFinished || _revealed || _chapter == null) return;
     _answers[_currentIndex] = optionIndex;
     _reveal();
   }
@@ -175,6 +179,9 @@ class QuizProvider extends ChangeNotifier {
     userId: userId,
     categoryId: _category!.id,
     categoryTitle: _category!.title,
+    chapterId: _chapter!.id,
+    chapterTitle: _chapter!.title,
+    chapterNumber: _chapter!.number,
     total: totalQuestions,
     correct: correctCount,
     timedOut: timedOutCount,
@@ -185,7 +192,9 @@ class QuizProvider extends ChangeNotifier {
   );
 
   void restartQuiz() {
-    if (_category != null) startQuiz(_category!);
+    if (_category != null && _chapter != null) {
+      startQuiz(_category!, _chapter!);
+    }
   }
 
   void resetQuiz() {
@@ -194,6 +203,7 @@ class QuizProvider extends ChangeNotifier {
       ..stop()
       ..reset();
     _category = null;
+    _chapter = null;
     _answers = [];
     _timedOut = [];
     _currentIndex = 0;

@@ -37,7 +37,7 @@ class ProgressBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Progres materi',
+                  'Progres belajar',
                   style: r
                       .text(context.texts.labelMedium)
                       .copyWith(color: palette.muted),
@@ -48,7 +48,7 @@ class ProgressBanner extends StatelessWidget {
                     text: '$done',
                     children: [
                       TextSpan(
-                        text: ' / $total materi',
+                        text: ' / $total bab',
                         style: TextStyle(color: palette.muted),
                       ),
                     ],
@@ -68,8 +68,8 @@ class ProgressBanner extends StatelessWidget {
                 SizedBox(height: r.sp(8)),
                 Text(
                   remaining == 0
-                      ? 'Semua materi sudah kamu coba.'
-                      : 'Tinggal $remaining materi lagi yang belum dicoba.',
+                      ? 'Semua bab sudah kamu selesaikan.'
+                      : 'Tinggal $remaining bab lagi yang belum dikerjakan.',
                   style: r
                       .text(context.texts.bodySmall)
                       .copyWith(color: palette.muted),

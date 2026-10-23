@@ -20,18 +20,17 @@ Future<void> pumpAt(
   Size size, {
   required String route,
   bool finished = false,
-  String? tapText,
+  List<String> taps = const [],
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final auth = AuthProvider()
-    ..enter('Angelica Happy Grace Harianja');
+  final auth = AuthProvider()..enter('Angelica Happy Grace Harianja');
   final history = HistoryProvider();
   final quiz = QuizProvider(secondsPerQuestion: 0)
     ..setUserName(auth.currentUser!.name)
-    ..startQuiz(quizCategories.last);
+    ..startQuiz(quizCategories.last, quizCategories.last.chapters.first);
   for (var i = 0; i < 4; i++) {
     quiz
       ..selectAnswer(i % 4)
@@ -50,8 +49,11 @@ Future<void> pumpAt(
     QuizApp(auth: auth, history: history, quiz: quiz, initialRoute: route),
   );
   await tester.pumpAndSettle();
-  if (tapText != null) {
-    await tester.tap(find.text(tapText).last);
+  for (final text in taps) {
+    final finder = find.text(text).last;
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
     await tester.pumpAndSettle();
   }
 }
@@ -75,8 +77,20 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('Detail materi', (tester) async {
-        await pumpAt(tester, size, route: '/main', tapText: 'Basis Data');
+      testWidgets('Daftar bab', (tester) async {
+        await pumpAt(tester, size, route: '/main', taps: ['Basis Data']);
+        expect(find.text('Daftar bab'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('Detail bab', (tester) async {
+        await pumpAt(
+          tester,
+          size,
+          route: '/main',
+          taps: ['Basis Data', 'Bahasa SQL'],
+        );
+        expect(find.text('Cara bermain'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
@@ -96,7 +110,7 @@ void main() {
           size,
           route: '/result',
           finished: true,
-          tapText: 'Lihat pembahasan',
+          taps: ['Lihat pembahasan'],
         );
         expect(tester.takeException(), isNull);
       });
@@ -107,7 +121,7 @@ void main() {
           size,
           route: '/main',
           finished: true,
-          tapText: 'Riwayat',
+          taps: ['Riwayat'],
         );
         expect(tester.takeException(), isNull);
       });
@@ -118,7 +132,7 @@ void main() {
           size,
           route: '/main',
           finished: true,
-          tapText: 'Profil',
+          taps: ['Profil'],
         );
         expect(tester.takeException(), isNull);
       });

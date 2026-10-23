@@ -11,7 +11,7 @@ void main() {
     test('Skor dihitung dari jawaban yang benar', () {
       final quiz = QuizProvider(secondsPerQuestion: 0)
         ..setUserName('  Budi  ')
-        ..startQuiz(quizCategories.first);
+        ..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
 
       expect(quiz.userName, 'Budi');
       expect(quiz.answeredCount, 0);
@@ -31,7 +31,7 @@ void main() {
 
     test('Jawaban dikunci setelah dipilih', () {
       final quiz = QuizProvider(secondsPerQuestion: 0)
-        ..startQuiz(quizCategories.first)
+        ..startQuiz(quizCategories.first, quizCategories.first.chapters.first)
         ..selectAnswer(0)
         ..selectAnswer(1);
       expect(quiz.currentAnswer, 0);
@@ -40,7 +40,7 @@ void main() {
 
     test('Combo bertambah saat benar dan kembali 0 saat salah', () {
       final quiz = QuizProvider(secondsPerQuestion: 0)
-        ..startQuiz(quizCategories.first);
+        ..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
       for (var i = 0; i < 3; i++) {
         quiz
           ..selectAnswer(quiz.currentQuestion.correctIndex)
@@ -56,7 +56,7 @@ void main() {
     test('Restart mengosongkan jawaban tapi nama tetap', () {
       final quiz = QuizProvider(secondsPerQuestion: 0)
         ..setUserName('Ani')
-        ..startQuiz(quizCategories.first)
+        ..startQuiz(quizCategories.first, quizCategories.first.chapters.first)
         ..selectAnswer(0)
         ..restartQuiz();
 
@@ -68,8 +68,9 @@ void main() {
 
     test('Waktu habis menandai soal dan menguncinya', () {
       fakeAsync((async) {
-        final quiz = QuizProvider(secondsPerQuestion: 5)
-          ..startQuiz(quizCategories.first);
+        final quiz = QuizProvider(
+          secondsPerQuestion: 5,
+        )..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
         async.elapse(const Duration(seconds: 3));
         expect(quiz.remainingSeconds, 2);
 
@@ -83,8 +84,9 @@ void main() {
 
     test('Timer berhenti saat pause dan lanjut saat resume', () {
       fakeAsync((async) {
-        final quiz = QuizProvider(secondsPerQuestion: 10)
-          ..startQuiz(quizCategories.first);
+        final quiz = QuizProvider(
+          secondsPerQuestion: 10,
+        )..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
         async.elapse(const Duration(seconds: 2));
         quiz.pause();
         async.elapse(const Duration(seconds: 5));
@@ -94,6 +96,38 @@ void main() {
         expect(quiz.remainingSeconds, 7);
         quiz.dispose();
       });
+    });
+  });
+
+  group('Data bab', () {
+    test('Setiap materi punya 3 bab, setiap bab 5 soal', () {
+      for (final category in quizCategories) {
+        expect(category.chapters, hasLength(3));
+        for (final chapter in category.chapters) {
+          expect(chapter.questions, hasLength(5));
+          for (final q in chapter.questions) {
+            expect(q.correctIndex, inInclusiveRange(0, q.options.length - 1));
+          }
+        }
+      }
+    });
+
+    test('Kuis hanya memakai soal dari bab yang dipilih', () {
+      final category = quizCategories[2];
+      final chapter = category.chapters[1];
+      final quiz = QuizProvider(secondsPerQuestion: 0)
+        ..startQuiz(category, chapter);
+      expect(quiz.chapter, chapter);
+      expect(quiz.totalQuestions, chapter.totalQuestions);
+      expect(quiz.currentQuestion, chapter.questions.first);
+      while (!quiz.isFinished) {
+        quiz
+          ..selectAnswer(quiz.currentQuestion.correctIndex)
+          ..nextQuestion();
+      }
+      final result = quiz.toResult('budi');
+      expect(result.chapterId, chapter.id);
+      expect(result.chapterNumber, 2);
     });
   });
 
@@ -113,7 +147,7 @@ void main() {
     test('Statistik dihitung per akun', () {
       final history = HistoryProvider();
       final quiz = QuizProvider(secondsPerQuestion: 0)
-        ..startQuiz(quizCategories.first);
+        ..startQuiz(quizCategories.first, quizCategories.first.chapters.first);
       while (!quiz.isFinished) {
         quiz
           ..selectAnswer(quiz.currentQuestion.correctIndex)
@@ -124,7 +158,18 @@ void main() {
       expect(history.resultsOf('angelica'), hasLength(1));
       expect(history.resultsOf('budi'), isEmpty);
       expect(history.averageScore('angelica'), 100);
-      expect(history.bestScore('angelica', quizCategories.first.id), 100);
+      final category = quizCategories.first;
+      expect(
+        history.bestChapterScore('angelica', category.chapters.first.id),
+        100,
+      );
+      expect(
+        history.bestChapterScore('angelica', category.chapters[1].id),
+        isNull,
+      );
+      expect(history.completedChapters('angelica', category), 1);
+      expect(history.totalCompletedChapters('angelica'), 1);
+      expect(history.categoryScore('angelica', category), 100);
       expect(history.triedCategories('angelica'), 1);
     });
   });

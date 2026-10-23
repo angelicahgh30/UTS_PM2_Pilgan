@@ -37,10 +37,6 @@ class HomeTab extends StatelessWidget {
     if (user == null) return const SizedBox.shrink();
 
     final userId = user.id;
-    final totalQuestions = quizCategories.fold<int>(
-      0,
-      (sum, c) => sum + c.totalQuestions,
-    );
 
     return NavyHeaderLayout(
       headerHeight: 150,
@@ -72,8 +68,8 @@ class HomeTab extends StatelessWidget {
           ),
           SizedBox(height: r.sp(24)),
           ProgressBanner(
-            done: history.triedCategories(userId),
-            total: quizCategories.length,
+            done: history.totalCompletedChapters(userId),
+            total: totalChapters,
           ),
           const _ResumeCard(),
           SizedBox(height: r.sp(16)),
@@ -111,17 +107,21 @@ class HomeTab extends StatelessWidget {
           SectionHeader(
             title: 'Pilih materi',
             subtitle:
-                '${quizCategories.length} materi · $totalQuestions soal latihan',
+                '${quizCategories.length} materi · $totalChapters bab · '
+                '$totalQuestions soal',
           ),
           AdaptiveGrid(
             children: [
               for (final category in quizCategories)
                 CategoryCard(
                   category: category,
-                  bestScore: history.bestScore(userId, category.id),
+                  completedChapters: history.completedChapters(
+                    userId,
+                    category,
+                  ),
                   onTap: () => Navigator.pushNamed(
                     context,
-                    AppRoutes.quizIntro,
+                    AppRoutes.chapters,
                     arguments: category,
                   ),
                 ),
@@ -141,7 +141,10 @@ class _ResumeCard extends StatelessWidget {
     final r = context.responsive;
     final quiz = context.watch<QuizProvider>();
     final category = quiz.category;
-    if (!quiz.isRunning || category == null) return const SizedBox.shrink();
+    final chapter = quiz.chapter;
+    if (!quiz.isRunning || category == null || chapter == null) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: EdgeInsets.only(top: r.sp(16)),
@@ -155,9 +158,20 @@ class _ResumeCard extends StatelessWidget {
                 Icon(category.icon, color: category.color, size: r.sp(22)),
                 SizedBox(width: r.sp(8)),
                 Expanded(
-                  child: Text(
-                    'Kuis ${category.title} belum selesai',
-                    style: r.text(context.texts.titleSmall),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${chapter.label}: ${chapter.title} belum selesai',
+                        style: r.text(context.texts.titleSmall),
+                      ),
+                      Text(
+                        category.title,
+                        style: r
+                            .text(context.texts.bodySmall)
+                            .copyWith(color: context.palette.muted),
+                      ),
+                    ],
                   ),
                 ),
               ],

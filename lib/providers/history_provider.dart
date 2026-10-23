@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/quiz_category.dart';
 import '../models/quiz_result.dart';
 
 class HistoryProvider extends ChangeNotifier {
@@ -19,10 +20,31 @@ class HistoryProvider extends ChangeNotifier {
     return (list.fold(0, (sum, r) => sum + r.score) / list.length).round();
   }
 
-  int? bestScore(String userId, String categoryId) {
-    final list = resultsOf(userId).where((r) => r.categoryId == categoryId);
+  /// Nilai terbaik pengguna pada satu bab, atau null jika belum dikerjakan.
+  int? bestChapterScore(String userId, String chapterId) {
+    final list = resultsOf(userId).where((r) => r.chapterId == chapterId);
     if (list.isEmpty) return null;
     return list.map((r) => r.score).reduce((a, b) => a > b ? a : b);
+  }
+
+  /// Jumlah bab pada satu materi yang sudah pernah diselesaikan.
+  int completedChapters(String userId, QuizCategory category) => category
+      .chapters
+      .where((c) => bestChapterScore(userId, c.id) != null)
+      .length;
+
+  /// Jumlah semua bab (dari semua materi) yang sudah pernah diselesaikan.
+  int totalCompletedChapters(String userId) =>
+      resultsOf(userId).map((r) => r.chapterId).toSet().length;
+
+  /// Rata-rata nilai terbaik dari bab yang sudah dikerjakan pada satu materi.
+  int? categoryScore(String userId, QuizCategory category) {
+    final scores = [
+      for (final chapter in category.chapters)
+        ?bestChapterScore(userId, chapter.id),
+    ];
+    if (scores.isEmpty) return null;
+    return (scores.reduce((a, b) => a + b) / scores.length).round();
   }
 
   int triedCategories(String userId) =>

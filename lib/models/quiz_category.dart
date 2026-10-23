@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'question.dart';
+import 'quiz_chapter.dart';
 
 class QuizCategory {
   final String id;
@@ -8,7 +8,7 @@ class QuizCategory {
   final String description;
   final IconData icon;
   final Color color;
-  final List<Question> questions;
+  final List<QuizChapter> chapters;
 
   const QuizCategory({
     required this.id,
@@ -16,8 +16,14 @@ class QuizCategory {
     required this.description,
     required this.icon,
     required this.color,
-    required this.questions,
+    required this.chapters,
   });
 
-  int get totalQuestions => questions.length;
+  int get totalChapters => chapters.length;
+
+  int get totalQuestions =>
+      chapters.fold(0, (sum, chapter) => sum + chapter.totalQuestions);
+
+  QuizChapter chapterById(String chapterId) =>
+      chapters.firstWhere((c) => c.id == chapterId);
 }

@@ -84,8 +84,8 @@ class HistoryTab extends StatelessWidget {
                       child: StatTile(
                         icon: Icons.auto_stories_outlined,
                         value:
-                            '${history.triedCategories(userId)}/${quizCategories.length}',
-                        label: 'Materi dicoba',
+                            '${history.totalCompletedChapters(userId)}/$totalChapters',
+                        label: 'Bab selesai',
                         color: context.palette.accent,
                       ),
                     ),
@@ -97,7 +97,7 @@ class HistoryTab extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Nilai terbaik per materi',
+                        'Progres per materi',
                         style: r.text(context.texts.titleMedium),
                       ),
                       SizedBox(height: r.sp(14)),
@@ -106,7 +106,9 @@ class HistoryTab extends StatelessWidget {
                           icon: category.icon,
                           color: category.color,
                           title: category.title,
-                          score: history.bestScore(userId, category.id),
+                          done: history.completedChapters(userId, category),
+                          total: category.totalChapters,
+                          score: history.categoryScore(userId, category),
                         ),
                     ],
                   ),
@@ -125,9 +127,7 @@ class HistoryTab extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: r.sp(10)),
                     child: ResultTile(
                       result: result,
-                      category: quizCategories.firstWhere(
-                        (c) => c.id == result.categoryId,
-                      ),
+                      category: categoryById(result.categoryId),
                       onTap: () => Navigator.pushNamed(
                         context,
                         AppRoutes.review,
@@ -148,12 +148,16 @@ class _BestScoreRow extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String title;
+  final int done;
+  final int total;
   final int? score;
 
   const _BestScoreRow({
     required this.icon,
     required this.color,
     required this.title,
+    required this.done,
+    required this.total,
     required this.score,
   });
 
@@ -185,7 +189,9 @@ class _BestScoreRow extends StatelessWidget {
                     SizedBox(width: r.sp(8)),
                     Flexible(
                       child: Text(
-                        score == null ? 'Belum dikerjakan' : '$score',
+                        score == null
+                            ? 'Belum dikerjakan'
+                            : '$done/$total bab · nilai $score',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: r
@@ -201,7 +207,7 @@ class _BestScoreRow extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(r.sp(6)),
                   child: LinearProgressIndicator(
-                    value: (score ?? 0) / 100,
+                    value: total == 0 ? 0 : done / total,
                     minHeight: r.sp(6),
                     color: color,
                     backgroundColor: color.withValues(alpha: 0.12),
